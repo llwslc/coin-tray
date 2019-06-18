@@ -24,7 +24,7 @@
       let height = 22;
 
       ctx.font = '10px';
-      let sWidth = ctx.measureText(content.symbol.replace('USDT', '')).width;
+      let sWidth = ctx.measureText(content.symbol).width;
       let pWidth = ctx.measureText(content.price).width;
       width = sWidth > pWidth ? sWidth : pWidth;
       canvas.width = width * dpr;
@@ -36,7 +36,7 @@
       ctx.fillRect(0, 0, width, height);
       ctx.fillStyle = '#FFF';
       ctx.font = '10px';
-      ctx.fillText(content.symbol.replace('USDT', ''), 0, height / 2 - 1);
+      ctx.fillText(content.symbol, 0, height / 2 - 1);
       ctx.fillText(content.price, 0, height - 1);
       let dataImg = canvas.toDataURL('image/png');
       ipcRenderer.send('showImg', dataImg, content, width, height);
