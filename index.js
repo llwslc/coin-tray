@@ -65,7 +65,7 @@ app.on('ready', () => {
     imageWin = new BrowserWindow({ width: 0, height: 0, frame: true, webPreferences: { nodeIntegration: true } });
   }
 
-  imageWin.loadURL(`file://${__dirname}/image.html`);
+  imageWin.loadURL(`file://${__dirname}/app/image.html`);
 
   setTimeout(getPrice, refreshTime);
 });
