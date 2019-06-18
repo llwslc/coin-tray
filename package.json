@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "cross-env NODE_ENV=development electron .",
     "start": "electron ."
   },
   "repository": {
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/llwslc/coin-tray#readme",
   "dependencies": {
+    "cross-env": "^5.2.0",
     "electron": "^5.0.4"
   }
 }

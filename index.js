@@ -2,7 +2,7 @@ const { app, Menu, ipcMain, BrowserWindow, nativeImage, Tray } = require('electr
 const https = require('https');
 
 let trayObj = {};
-let symbolFilter = ['BNBUSDT', 'LTCUSDT', 'BTCUSDT'];
+let symbolFilter = ['BNBUSDT', 'LTCUSDT'];
 let refreshTime = 1000;
 let imageWin = null;
 
@@ -35,8 +35,10 @@ let getPrice = () => {
   setTimeout(getPrice, refreshTime);
 };
 
+app.dock.hide();
 app.on('ready', () => {
   trayObj = {};
+
   let tray = new Tray(`${__dirname}/icon.png`);
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -55,17 +57,19 @@ app.on('ready', () => {
     trayObj[s] = new Tray(`${__dirname}/icon.png`);
   }
 
-  imageWin = new BrowserWindow({ width: 0, height: 0, frame: true, webPreferences: { nodeIntegration: true } });
-
-  // debug
-  // imageWin = new BrowserWindow({ width: 800, height: 600, frame: true, webPreferences: { nodeIntegration: true } });
-  // imageWin.webContents.openDevTools();
+  if (process.env.NODE_ENV) {
+    imageWin = new BrowserWindow({ width: 800, height: 600, frame: true, webPreferences: { nodeIntegration: true } });
+    imageWin.webContents.openDevTools();
+    app.dock.show();
+  } else {
+    imageWin = new BrowserWindow({ width: 0, height: 0, frame: true, webPreferences: { nodeIntegration: true } });
+  }
 
   imageWin.loadURL(`file://${__dirname}/image.html`);
 
   setTimeout(getPrice, refreshTime);
 });
 
-ipcMain.on('showImg', (event, img, content) => {
-  trayObj[content.symbol].setImage(nativeImage.createFromDataURL(img).resize({ width: 50, height: 22 }));
+ipcMain.on('showImg', (event, img, content, width, height) => {
+  trayObj[content.symbol].setImage(nativeImage.createFromDataURL(img).resize({ width, height }));
 });
