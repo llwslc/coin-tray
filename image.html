@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <canvas id="canvas" width="60" height="22">
+      Your browser does not support the HTML5 canvas tag.
+    </canvas>
+  </body>
+
+  <script type="text/javascript">
+    const { ipcRenderer } = require('electron');
+
+    ipcRenderer.on('genImg', (event, arg) => {
+      if (arg) {
+        generateInfoImg(arg);
+      }
+    });
+
+    console.log(window.devicePixelRatio);
+
+    function generateInfoImg(content) {
+      let canvas = document.getElementById('canvas');
+      var dpr = window.devicePixelRatio || 1;
+      canvas.width = 50 * dpr;
+      canvas.height = 22 * dpr;
+      var ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      ctx.clearRect(0, 0, 50, 22);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0)';
+      ctx.fillRect(0, 0, 50, 22);
+      ctx.fillStyle = '#fff';
+      ctx.font = '7px';
+      ctx.fillText(content.symbol, 0, 10);
+      ctx.font = '8px';
+      ctx.fillText(content.price, 0, 20);
+      let dataImg = canvas.toDataURL('image/png');
+      ipcRenderer.send('showImg', dataImg, content);
+    }
+  </script>
+</html>

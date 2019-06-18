@@ -1,0 +1,22 @@
+{
+  "name": "coin-tray",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://llwslc@github.com/llwslc/coin-tray.git"
+  },
+  "author": "llwslc <llwslc@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/llwslc/coin-tray/issues"
+  },
+  "homepage": "https://github.com/llwslc/coin-tray#readme",
+  "dependencies": {
+    "electron": "^5.0.4"
+  }
+}
