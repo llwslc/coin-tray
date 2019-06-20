@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "postinstall": "cd app && npm i",
+    "serve": "cd app && npm run serve",
+    "build": "cd app && npm run build",
     "dev": "cross-env NODE_ENV=development electron .",
     "start": "electron ."
   },

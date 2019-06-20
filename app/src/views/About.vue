@@ -1,15 +1,19 @@
-<!DOCTYPE html>
-<html>
-  <body>
-    <canvas id="canvas" width="60" height="22">
-      Your browser does not support the HTML5 canvas tag.
-    </canvas>
-  </body>
+<template>
+  <div class="about">
+    <h1>This is an about page</h1>
+    <canvas id="canvas" width="60" height="22">Your browser does not support the HTML5 canvas tag.</canvas>
+  </div>
+</template>
 
-  <script type="text/javascript">
+
+<script>
+export default {
+  name: 'About',
+  mounted: function() {
     const { ipcRenderer } = require('electron');
 
     ipcRenderer.on('genImg', (event, arg) => {
+      console.log(1);
       if (arg) {
         generateInfoImg(arg);
       }
@@ -41,5 +45,13 @@
       let dataImg = canvas.toDataURL('image/png');
       ipcRenderer.send('showImg', dataImg, content, width, height);
     }
-  </script>
-</html>
+  }
+};
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+.about canvas {
+  display: none;
+}
+</style>

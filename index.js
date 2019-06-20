@@ -5,6 +5,7 @@ let trayObj = {};
 let symbolFilter = ['BNBUSDT', 'LTCUSDT'];
 let refreshTime = 1000;
 let imageWin = null;
+let baseUrl = 'http://localhost:8080/#';
 
 let getPrice = () => {
   https
@@ -62,12 +63,13 @@ app.on('ready', () => {
     imageWin.webContents.openDevTools();
     app.dock.show();
   } else {
-    imageWin = new BrowserWindow({ width: 0, height: 0, frame: true, webPreferences: { nodeIntegration: true } });
+    baseUrl = `file://${__dirname}/app/dist`;
+    imageWin = new BrowserWindow({ width: 0, height: 0, frame: true, show: false, webPreferences: { nodeIntegration: true } });
   }
 
-  imageWin.loadURL(`file://${__dirname}/app/image.html`);
+  imageWin.loadURL(`${baseUrl}/about`);
 
-  setTimeout(getPrice, refreshTime);
+  getPrice();
 });
 
 ipcMain.on('showImg', (event, img, content, width, height) => {
