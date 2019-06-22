@@ -62,8 +62,12 @@ app.on('ready', () => {
     imageWin = new BrowserWindow({ width: 800, height: 600, frame: true, webPreferences: { nodeIntegration: true } });
     imageWin.webContents.openDevTools();
     app.dock.show();
+
+    if (process.env.NODE_ENV == 'build') {
+      baseUrl = `file://${__dirname}/app/dist/index.html#`;
+    }
   } else {
-    baseUrl = `file://${__dirname}/app/dist`;
+    baseUrl = `file://${__dirname}/app/dist/index.html#`;
     imageWin = new BrowserWindow({ width: 0, height: 0, frame: true, show: false, webPreferences: { nodeIntegration: true } });
   }
 

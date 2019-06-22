@@ -8,6 +8,7 @@
     "serve": "cd app && npm run serve",
     "build": "cd app && npm run build",
     "dev": "cross-env NODE_ENV=development electron .",
+    "dev:build": "cross-env NODE_ENV=build electron .",
     "start": "electron ."
   },
   "repository": {
