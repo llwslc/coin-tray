@@ -7,13 +7,12 @@
 
 
 <script>
+const { ipcRenderer } = require('electron');
+
 export default {
   name: 'About',
   mounted: function() {
-    const { ipcRenderer } = require('electron');
-
     ipcRenderer.on('genImg', (event, arg) => {
-      console.log(1);
       if (arg) {
         generateInfoImg(arg);
       }
