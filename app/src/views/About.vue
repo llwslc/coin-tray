@@ -39,7 +39,7 @@ export default {
       ctx.fillRect(0, 0, width, height);
       ctx.fillStyle = '#FFF';
       ctx.font = '10px';
-      ctx.fillText(content.symbol, 0, height / 2 - 1);
+      ctx.fillText(content.rename, 0, height / 2 - 1);
       ctx.fillText(content.price, 0, height - 1);
       let dataImg = canvas.toDataURL('image/png');
       ipcRenderer.send('showImg', dataImg, content, width, height);

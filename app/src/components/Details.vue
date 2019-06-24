@@ -9,11 +9,11 @@
     </div>
     <div v-for="(item, index) in symbols" :key="index">
       <div class="col5">
-        <VueSwitch class="extend-left" v-model="item.show" @click="updateSettings">{{ item.symbol }}</VueSwitch>
-        <VueInput v-model="item.rename" @update="updateSettings" placeholder="rename"/>
+        <VueSwitch class="extend-left" v-model="item.show">{{ item.symbol }}</VueSwitch>
+        <VueInput v-model="item.rename" placeholder="rename"/>
         <span>{{ item.price }}</span>
-        <VueInput v-model="item.low" @update="updateSettings" placeholder="Low"/>
-        <VueInput v-model="item.high" @update="updateSettings" placeholder="High"/>
+        <VueInput v-model="item.low" placeholder="Low"/>
+        <VueInput v-model="item.high" placeholder="High"/>
       </div>
     </div>
   </div>
@@ -61,19 +61,23 @@ export default {
       }
 
       this.symbols = Object.values(sObj);
-    },
-    updateSettings: function() {
-      console.log(1);
-      let showSymbol = this.symbols.filter(_ => _.show);
-      let sObj = {};
-      for (const sf of showSymbol) {
-        sObj[sf.symbol] = {};
-        sObj[sf.symbol].rename = sf.rename;
-        sObj[sf.symbol].low = sf.low;
-        sObj[sf.symbol].high = sf.high;
-      }
+    }
+  },
+  watch: {
+    symbols: {
+      handler: function(val) {
+        let showSymbol = val.filter(_ => _.show);
+        let sObj = {};
+        for (const sf of showSymbol) {
+          sObj[sf.symbol] = {};
+          sObj[sf.symbol].rename = sf.rename;
+          sObj[sf.symbol].low = sf.low;
+          sObj[sf.symbol].high = sf.high;
+        }
 
-      ipcRenderer.send('updateSettings', sObj);
+        ipcRenderer.send('updateSettings', sObj);
+      },
+      deep: true
     }
   }
 };
