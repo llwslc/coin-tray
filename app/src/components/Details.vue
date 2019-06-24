@@ -1,19 +1,21 @@
 <template>
   <div class="details">
-    <div class="col5">
+    <div id="header" class="col5">
       <span>Symbol</span>
       <span>Rename</span>
       <span>Price</span>
       <span>Low Alarm</span>
       <span>High Alarm</span>
     </div>
-    <div v-for="(item, index) in symbols" :key="index">
-      <div class="col5">
-        <VueSwitch class="extend-left" v-model="item.show">{{ item.symbol }}</VueSwitch>
-        <VueInput v-model="item.rename" placeholder="rename"/>
-        <span>{{ item.price }}</span>
-        <VueInput v-model="item.low" placeholder="Low"/>
-        <VueInput v-model="item.high" placeholder="High"/>
+    <div class="list" :style="{height: listHeight+'px'}">
+      <div v-for="(item, index) in symbols" :key="index">
+        <div class="col5">
+          <VueSwitch class="extend-left" v-model="item.show">{{ item.symbol }}</VueSwitch>
+          <VueInput v-model="item.rename" placeholder="rename"/>
+          <span>{{ item.price }}</span>
+          <VueInput v-model="item.low" placeholder="Low"/>
+          <VueInput v-model="item.high" placeholder="High"/>
+        </div>
       </div>
     </div>
   </div>
@@ -26,7 +28,7 @@ export default {
   name: 'Details',
   props: {},
   data: function() {
-    return { symbols: [] };
+    return { symbols: [], listHeight: 0 };
   },
   mounted: function() {
     ipcRenderer.send('getSettings');
@@ -35,6 +37,11 @@ export default {
         this.getSetting(arg);
       }
     });
+    this.listHeight =
+      document.documentElement.clientHeight -
+      document.getElementById('nav').clientHeight -
+      document.getElementById('header').clientHeight -
+      document.getElementById('search').clientHeight;
   },
   methods: {
     getSetting: function(settings) {
@@ -88,7 +95,9 @@ export default {
 .details {
   text-align: left;
   margin: 0 12px;
-
+  .list {
+    overflow: scroll;
+  }
   .col5 {
     margin-bottom: 12px;
     display: grid;

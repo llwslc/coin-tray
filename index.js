@@ -157,3 +157,11 @@ ipcMain.on('updateSettings', (event, _symbolFilter) => {
     }
   }
 });
+
+ipcMain.on('searchSymbol', (event, symbol, opt) => {
+  if (symbol) {
+    event.sender.webContents.findInPage(symbol, opt);
+  } else {
+    event.sender.webContents.stopFindInPage('clearSelection');
+  }
+});

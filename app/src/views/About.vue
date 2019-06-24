@@ -27,7 +27,7 @@ export default {
       let height = 22;
 
       ctx.font = '10px';
-      let sWidth = ctx.measureText(content.symbol).width;
+      let sWidth = ctx.measureText(content.rename).width;
       let pWidth = ctx.measureText(content.price).width;
       width = sWidth > pWidth ? sWidth : pWidth;
       canvas.width = width * dpr;
