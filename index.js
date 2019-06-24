@@ -12,6 +12,7 @@ let baseUrl = 'http://localhost:8080/#';
 let symbolCache = [];
 let settingsFileName = 'settings';
 let settingsFilePath = '';
+let defaultIcon = nativeImage.createFromPath(`${__dirname}/icon.png`).resize({ width: 22, height: 22 });
 
 let getPrice = () => {
   https
@@ -63,7 +64,7 @@ app.dock.hide();
 app.on('ready', () => {
   trayObj = {};
 
-  let tray = new Tray(`${__dirname}/icon.png`);
+  let tray = new Tray(defaultIcon);
   const contextMenu = Menu.buildFromTemplate([
     {
       label: '设置',
@@ -98,7 +99,7 @@ app.on('ready', () => {
   readSettings();
 
   for (const s of Object.keys(symbolFilter)) {
-    trayObj[s] = new Tray(`${__dirname}/icon.png`);
+    trayObj[s] = new Tray(defaultIcon);
   }
 
   if (process.env.NODE_ENV) {
