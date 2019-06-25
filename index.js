@@ -1,4 +1,4 @@
-const { app, Menu, ipcMain, BrowserWindow, nativeImage, Tray } = require('electron');
+const { app, Menu, ipcMain, BrowserWindow, nativeImage, systemPreferences, Tray } = require('electron');
 const https = require('https');
 const path = require('path');
 const fs = require('fs');
@@ -12,7 +12,7 @@ let baseUrl = 'http://localhost:8080/#';
 let symbolCache = [];
 let settingsFileName = 'settings';
 let settingsFilePath = '';
-let defaultIcon = nativeImage.createFromPath(`${__dirname}/icon.png`).resize({ width: 22, height: 22 });
+let isDarkMode = systemPreferences.isDarkMode();
 
 let getPrice = () => {
   https
@@ -30,6 +30,7 @@ let getPrice = () => {
             if (symbolArr.indexOf(p.symbol) > -1) {
               p.price = parseFloat(p.price);
               p.rename = symbolFilter[p.symbol].rename;
+              p.isDarkMode = systemPreferences.isDarkMode();
               imageWin.webContents.send('genImg', p);
             }
           }
@@ -60,11 +61,15 @@ let readSettings = () => {
   }
 };
 
+let defaultIcon = () => {
+  return nativeImage.createFromPath(`${__dirname}/icon/icon_${isDarkMode ? 'white' : 'black'}.png`).resize({ width: 22, height: 22 });
+};
+
 app.dock.hide();
 app.on('ready', () => {
   trayObj = {};
 
-  let tray = new Tray(defaultIcon);
+  let tray = new Tray(defaultIcon());
   const contextMenu = Menu.buildFromTemplate([
     {
       label: '设置',
@@ -99,7 +104,7 @@ app.on('ready', () => {
   readSettings();
 
   for (const s of Object.keys(symbolFilter)) {
-    trayObj[s] = new Tray(defaultIcon);
+    trayObj[s] = new Tray(defaultIcon());
   }
 
   if (process.env.NODE_ENV) {
@@ -154,7 +159,7 @@ ipcMain.on('updateSettings', (event, _symbolFilter) => {
 
   for (const s of symbolArr) {
     if (!trayObj[s]) {
-      trayObj[s] = new Tray(`${__dirname}/icon.png`);
+      trayObj[s] = new Tray(defaultIcon());
     }
   }
 });
@@ -165,4 +170,10 @@ ipcMain.on('searchSymbol', (event, symbol, opt) => {
   } else {
     event.sender.webContents.stopFindInPage('clearSelection');
   }
+});
+
+systemPreferences.on('appearance-changed', () => {
+  isDarkMode = systemPreferences.isDarkMode();
+  imageWin.webContents.send('darkMode', isDarkMode);
+  tray.main.setImage(defaultIcon());
 });

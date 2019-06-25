@@ -37,7 +37,7 @@ export default {
       ctx.clearRect(0, 0, width, height);
       ctx.fillStyle = 'rgba(255, 255, 255, 0)';
       ctx.fillRect(0, 0, width, height);
-      ctx.fillStyle = '#FFF';
+      content.isDarkMode ? (ctx.fillStyle = '#FFF') : (ctx.fillStyle = '#000');
       ctx.font = '10px';
       ctx.fillText(content.rename, 0, height / 2 - 1);
       ctx.fillText(content.price, 0, height - 1);
