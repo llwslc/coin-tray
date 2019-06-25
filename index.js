@@ -65,6 +65,17 @@ let defaultIcon = () => {
   return nativeImage.createFromPath(`${__dirname}/icon/icon_${isDarkMode ? 'white' : 'black'}.png`).resize({ width: 22, height: 22 });
 };
 
+let setMainTray = () => {
+  if (isDarkMode != systemPreferences.isDarkMode()) {
+    isDarkMode = systemPreferences.isDarkMode();
+    trayObj.main.setImage(defaultIcon());
+  }
+
+  setTimeout(() => {
+    setMainTray();
+  }, refreshTime);
+};
+
 app.dock.hide();
 app.on('ready', () => {
   trayObj = {};
@@ -102,6 +113,7 @@ app.on('ready', () => {
   trayObj.main = tray;
 
   readSettings();
+  setMainTray();
 
   for (const s of Object.keys(symbolFilter)) {
     trayObj[s] = new Tray(defaultIcon());
@@ -170,10 +182,4 @@ ipcMain.on('searchSymbol', (event, symbol, opt) => {
   } else {
     event.sender.webContents.stopFindInPage('clearSelection');
   }
-});
-
-systemPreferences.on('appearance-changed', () => {
-  isDarkMode = systemPreferences.isDarkMode();
-  imageWin.webContents.send('darkMode', isDarkMode);
-  tray.main.setImage(defaultIcon());
 });
