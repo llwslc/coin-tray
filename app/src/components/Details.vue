@@ -73,6 +73,7 @@ export default {
   watch: {
     symbols: {
       handler: function(val) {
+        if (val.length == 0) return;
         let showSymbol = val.filter(_ => _.show);
         let sObj = {};
         for (const sf of showSymbol) {
