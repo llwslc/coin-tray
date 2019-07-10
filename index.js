@@ -16,7 +16,7 @@ let isDarkMode = systemPreferences.isDarkMode();
 
 let getPrice = () => {
   https
-    .get('https://api.binance.com/api/v3/ticker/price', res => {
+    .get('https://data.gateio.co/api2/1/marketlist', res => {
       let rawData = '';
       res.on('data', chunk => {
         rawData += chunk;
@@ -25,8 +25,10 @@ let getPrice = () => {
         try {
           let d = JSON.parse(rawData);
           let symbolArr = Object.keys(symbolFilter);
-          symbolCache = d;
-          for (const p of d) {
+          symbolCache = d.data;
+          for (const p of symbolCache) {
+            p.symbol = p.pair;
+            p.price = p.rate;
             if (symbolArr.indexOf(p.symbol) > -1) {
               p.price = parseFloat(p.price);
               p.rename = symbolFilter[p.symbol].rename;
@@ -36,7 +38,7 @@ let getPrice = () => {
           }
         } catch (error) {
           // error
-          console.log(error);
+          console.log('api: ', error);
         }
       });
     })
@@ -56,7 +58,7 @@ let readSettings = () => {
       let settingsJson = JSON.parse(settingsString);
       symbolFilter = settingsJson;
     } catch (error) {
-      console.log(error);
+      console.log('setting: ', error);
     }
   }
 };
