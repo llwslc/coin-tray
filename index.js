@@ -33,6 +33,11 @@ let getPrice = () => {
               p.price = parseFloat(p.price);
               p.rename = symbolFilter[p.symbol].rename;
               p.isDarkMode = nativeTheme.shouldUseDarkColors;
+              if (p.price >= symbolFilter[p.symbol].high || p.price <= symbolFilter[p.symbol].low) {
+                p.warning = true;
+              } else {
+                p.warning = false;
+              }
               imageWin.webContents.send('genImg', p);
             }
           }
@@ -156,11 +161,6 @@ app.on('ready', () => {
 ipcMain.on('showImg', (event, img, data, width, height) => {
   if (trayObj[data.symbol]) {
     trayObj[data.symbol].setImage(nativeImage.createFromDataURL(img).resize({ width, height }));
-    if (data.price >= symbolFilter[data.symbol].high || data.price <= symbolFilter[data.symbol].low) {
-      trayObj[data.symbol].setHighlightMode('always');
-    } else {
-      trayObj[data.symbol].setHighlightMode('selection');
-    }
   }
 });
 

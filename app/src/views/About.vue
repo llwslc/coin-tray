@@ -5,7 +5,6 @@
   </div>
 </template>
 
-
 <script>
 const { ipcRenderer } = require('electron');
 
@@ -35,7 +34,7 @@ export default {
       ctx.scale(dpr, dpr);
 
       ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = 'rgba(255, 255, 255, 0)';
+      content.warning ? (ctx.fillStyle = '#2865C7') : (ctx.fillStyle = 'rgba(255, 255, 255, 0)');
       ctx.fillRect(0, 0, width, height);
       content.isDarkMode ? (ctx.fillStyle = '#FFF') : (ctx.fillStyle = '#000');
       ctx.font = '10px';
