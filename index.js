@@ -70,7 +70,6 @@ let defaultIcon = () => {
 };
 
 let setMainTray = () => {
-  console.log(nativeTheme.shouldUseDarkColors);
   if (isDarkMode != nativeTheme.shouldUseDarkColors) {
     isDarkMode = nativeTheme.shouldUseDarkColors;
     trayObj.main.setImage(defaultIcon());
