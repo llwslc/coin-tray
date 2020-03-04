@@ -1,4 +1,4 @@
-const { app, Menu, ipcMain, BrowserWindow, nativeImage, systemPreferences, Tray } = require('electron');
+const { app, Menu, ipcMain, BrowserWindow, nativeImage, nativeTheme, Tray } = require('electron');
 const https = require('https');
 const path = require('path');
 const fs = require('fs');
@@ -12,7 +12,7 @@ let baseUrl = 'http://localhost:8080/#';
 let symbolCache = [];
 let settingsFileName = 'settings';
 let settingsFilePath = '';
-let isDarkMode = systemPreferences.isDarkMode();
+let isDarkMode = nativeTheme.shouldUseDarkColors;
 
 let getPrice = () => {
   https
@@ -32,7 +32,7 @@ let getPrice = () => {
             if (symbolArr.indexOf(p.symbol) > -1) {
               p.price = parseFloat(p.price);
               p.rename = symbolFilter[p.symbol].rename;
-              p.isDarkMode = systemPreferences.isDarkMode();
+              p.isDarkMode = nativeTheme.shouldUseDarkColors;
               imageWin.webContents.send('genImg', p);
             }
           }
@@ -64,12 +64,15 @@ let readSettings = () => {
 };
 
 let defaultIcon = () => {
-  return nativeImage.createFromPath(`${__dirname}/icon/icon_${isDarkMode ? 'white' : 'black'}.png`).resize({ width: 22, height: 22 });
+  return nativeImage
+    .createFromPath(`${__dirname}/icon/icon_${isDarkMode ? 'white' : 'black'}.png`)
+    .resize({ width: 22, height: 22 });
 };
 
 let setMainTray = () => {
-  if (isDarkMode != systemPreferences.isDarkMode()) {
-    isDarkMode = systemPreferences.isDarkMode();
+  console.log(nativeTheme.shouldUseDarkColors);
+  if (isDarkMode != nativeTheme.shouldUseDarkColors) {
+    isDarkMode = nativeTheme.shouldUseDarkColors;
     trayObj.main.setImage(defaultIcon());
   }
 
@@ -90,7 +93,12 @@ app.on('ready', () => {
         if (settingsWin) {
           settingsWin.show();
         } else {
-          settingsWin = new BrowserWindow({ width: 800, height: 600, frame: true, webPreferences: { nodeIntegration: true } });
+          settingsWin = new BrowserWindow({
+            width: 800,
+            height: 600,
+            frame: true,
+            webPreferences: { nodeIntegration: true }
+          });
           if (process.env.NODE_ENV) {
             settingsWin.webContents.openDevTools();
           }
@@ -132,7 +140,13 @@ app.on('ready', () => {
     }
   } else {
     baseUrl = `file://${__dirname}/app/dist/index.html#`;
-    imageWin = new BrowserWindow({ width: 0, height: 0, frame: true, show: false, webPreferences: { nodeIntegration: true } });
+    imageWin = new BrowserWindow({
+      width: 0,
+      height: 0,
+      frame: true,
+      show: false,
+      webPreferences: { nodeIntegration: true }
+    });
   }
 
   imageWin.loadURL(`${baseUrl}/about`);

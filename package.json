@@ -23,6 +23,6 @@
   "homepage": "https://github.com/llwslc/coin-tray#readme",
   "dependencies": {
     "cross-env": "^5.2.0",
-    "electron": "^5.0.4"
+    "electron": "^8.0.3"
   }
 }
