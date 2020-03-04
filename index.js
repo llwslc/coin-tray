@@ -16,7 +16,7 @@ let isDarkMode = systemPreferences.isDarkMode();
 
 let getPrice = () => {
   https
-    .get('https://data.gateio.co/api2/1/marketlist', res => {
+    .get('https://data.gateio.life/api2/1/marketlist', res => {
       let rawData = '';
       res.on('data', chunk => {
         rawData += chunk;
