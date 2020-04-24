@@ -1,5 +1,5 @@
 const { app, Menu, ipcMain, BrowserWindow, nativeImage, nativeTheme, Tray } = require('electron');
-const https = require('https');
+const http = require('http');
 const path = require('path');
 const fs = require('fs');
 
@@ -15,38 +15,45 @@ let settingsFilePath = '';
 let isDarkMode = nativeTheme.shouldUseDarkColors;
 
 let getPrice = () => {
-  https
-    .get('https://data.gateio.life/api2/1/marketlist', res => {
-      let rawData = '';
-      res.on('data', chunk => {
-        rawData += chunk;
-      });
-      res.on('end', () => {
-        try {
-          let d = JSON.parse(rawData);
-          let symbolArr = Object.keys(symbolFilter);
-          symbolCache = d.data;
-          for (const p of symbolCache) {
-            p.symbol = p.pair;
-            p.price = p.rate;
-            if (symbolArr.indexOf(p.symbol) > -1) {
-              p.price = parseFloat(p.price);
-              p.rename = symbolFilter[p.symbol].rename;
-              p.isDarkMode = nativeTheme.shouldUseDarkColors;
-              if (p.price >= symbolFilter[p.symbol].high || p.price <= symbolFilter[p.symbol].low) {
-                p.warning = true;
-              } else {
-                p.warning = false;
+  http
+    .get(
+      {
+        host: '127.0.0.1',
+        port: 7890,
+        path: 'https://data.gateio.life/api2/1/marketlist'
+      },
+      res => {
+        let rawData = '';
+        res.on('data', chunk => {
+          rawData += chunk;
+        });
+        res.on('end', () => {
+          try {
+            let d = JSON.parse(rawData);
+            let symbolArr = Object.keys(symbolFilter);
+            symbolCache = d.data;
+            for (const p of symbolCache) {
+              p.symbol = p.pair;
+              p.price = p.rate;
+              if (symbolArr.indexOf(p.symbol) > -1) {
+                p.price = parseFloat(p.price);
+                p.rename = symbolFilter[p.symbol].rename;
+                p.isDarkMode = nativeTheme.shouldUseDarkColors;
+                if (p.price >= symbolFilter[p.symbol].high || p.price <= symbolFilter[p.symbol].low) {
+                  p.warning = true;
+                } else {
+                  p.warning = false;
+                }
+                imageWin.webContents.send('genImg', p);
               }
-              imageWin.webContents.send('genImg', p);
             }
+          } catch (error) {
+            // error
+            console.log('api: ', error);
           }
-        } catch (error) {
-          // error
-          console.log('api: ', error);
-        }
-      });
-    })
+        });
+      }
+    )
     .on('error', e => {
       console.error(e);
     });
@@ -93,7 +100,7 @@ app.on('ready', () => {
   const contextMenu = Menu.buildFromTemplate([
     {
       label: '设置',
-      click: function() {
+      click: () => {
         if (settingsWin) {
           settingsWin.show();
         } else {
@@ -106,7 +113,7 @@ app.on('ready', () => {
           if (process.env.NODE_ENV) {
             settingsWin.webContents.openDevTools();
           }
-          settingsWin.on('close', function() {
+          settingsWin.on('close', () => {
             settingsWin = null;
           });
           settingsWin.maximize();
@@ -116,7 +123,7 @@ app.on('ready', () => {
     },
     {
       label: '退出',
-      click: function() {
+      click: () => {
         app.quit();
       }
     }
