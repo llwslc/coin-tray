@@ -5,7 +5,7 @@ const fs = require('fs');
 
 let trayObj = {};
 let symbolFilter = {};
-let refreshTime = 1000;
+let refreshTime = 3000;
 let settingsWin = null;
 let imageWin = null;
 let baseUrl = 'http://localhost:8080/#';
@@ -49,16 +49,17 @@ let getPrice = () => {
             }
           } catch (error) {
             // error
-            console.log('api: ', error);
+            console.log('api: ', error.message);
           }
+
+          setTimeout(getPrice, refreshTime);
         });
       }
     )
-    .on('error', e => {
-      console.error(e);
+    .on('error', error => {
+      console.error(`http: `, error.message);
+      setTimeout(getPrice, refreshTime);
     });
-
-  setTimeout(getPrice, refreshTime);
 };
 
 let readSettings = () => {
@@ -92,6 +93,7 @@ let setMainTray = () => {
   }, refreshTime);
 };
 
+app.allowRendererProcessReuse = true;
 app.dock.hide();
 app.on('ready', () => {
   trayObj = {};
