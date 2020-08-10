@@ -5,7 +5,7 @@ const fs = require('fs');
 
 let trayObj = {};
 let symbolFilter = {};
-let refreshTime = 3000;
+let refreshTime = 1000;
 let settingsWin = null;
 let imageWin = null;
 let baseUrl = 'http://localhost:8080/#';
