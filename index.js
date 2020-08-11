@@ -49,7 +49,7 @@ let getPrice = () => {
             }
           } catch (error) {
             // error
-            console.log('api: ', error.message);
+            console.log(`[${new Date().toLocaleTimeString('en-GB')}]api: ${error.message}`);
           }
 
           setTimeout(getPrice, refreshTime);
@@ -57,7 +57,7 @@ let getPrice = () => {
       }
     )
     .on('error', error => {
-      console.error(`http: `, error.message);
+      console.error(`[${new Date().toLocaleTimeString('en-GB')}]http: ${error.message}`);
       setTimeout(getPrice, refreshTime);
     });
 };
