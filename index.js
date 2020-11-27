@@ -3,9 +3,9 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 
+const refreshTime = 1000;
 let trayObj = {};
 let symbolFilter = {};
-let refreshTime = 1000;
 let settingsWin = null;
 let imageWin = null;
 let baseUrl = 'http://localhost:8080/#';
@@ -14,7 +14,7 @@ let settingsFileName = 'settings';
 let settingsFilePath = '';
 let isDarkMode = nativeTheme.shouldUseDarkColors;
 
-let getPrice = () => {
+const getPrice = () => {
   http
     .get(
       {
@@ -29,8 +29,9 @@ let getPrice = () => {
         });
         res.on('end', () => {
           try {
-            let d = JSON.parse(rawData);
-            let symbolArr = Object.keys(symbolFilter);
+            const d = JSON.parse(rawData);
+            const symbolArr = Object.keys(symbolFilter);
+            const imgData = [];
             symbolCache = d.data;
             for (const p of symbolCache) {
               p.symbol = p.pair;
@@ -38,15 +39,16 @@ let getPrice = () => {
               if (symbolArr.indexOf(p.symbol) > -1) {
                 p.price = parseFloat(p.price);
                 p.rename = symbolFilter[p.symbol].rename;
-                p.isDarkMode = nativeTheme.shouldUseDarkColors;
+                p.isDarkMode = isDarkMode;
                 if (p.price >= symbolFilter[p.symbol].high || p.price <= symbolFilter[p.symbol].low) {
                   p.warning = true;
                 } else {
                   p.warning = false;
                 }
-                imageWin.webContents.send('genImg', p);
+                imgData.push(p);
               }
             }
+            imageWin.webContents.send('genImg', imgData);
           } catch (error) {
             // error
             console.log(`[${new Date().toLocaleTimeString('en-GB')}]api: ${error.message}`);
@@ -62,13 +64,13 @@ let getPrice = () => {
     });
 };
 
-let readSettings = () => {
+const readSettings = () => {
   symbolFilter = {};
   settingsFilePath = path.join(app.getPath('userData'), settingsFileName);
   if (fs.existsSync(settingsFilePath)) {
-    let settingsString = fs.readFileSync(settingsFilePath);
+    const settingsString = fs.readFileSync(settingsFilePath);
     try {
-      let settingsJson = JSON.parse(settingsString);
+      const settingsJson = JSON.parse(settingsString);
       symbolFilter = settingsJson;
     } catch (error) {
       console.log('setting: ', error);
@@ -76,16 +78,16 @@ let readSettings = () => {
   }
 };
 
-let defaultIcon = () => {
+const defaultIcon = () => {
   return nativeImage
     .createFromPath(`${__dirname}/icon/icon_${isDarkMode ? 'white' : 'black'}.png`)
     .resize({ width: 22, height: 22 });
 };
 
-let setMainTray = () => {
+const setMainTray = () => {
   if (isDarkMode != nativeTheme.shouldUseDarkColors) {
     isDarkMode = nativeTheme.shouldUseDarkColors;
-    trayObj.main.setImage(defaultIcon());
+    trayObj.setImage(defaultIcon());
   }
 
   setTimeout(() => {
@@ -96,9 +98,7 @@ let setMainTray = () => {
 app.allowRendererProcessReuse = true;
 app.dock.hide();
 app.on('ready', () => {
-  trayObj = {};
-
-  let tray = new Tray(defaultIcon());
+  trayObj = new Tray(defaultIcon());
   const contextMenu = Menu.buildFromTemplate([
     {
       label: '设置',
@@ -130,17 +130,11 @@ app.on('ready', () => {
       }
     }
   ]);
-  tray.setToolTip('price');
-  tray.setContextMenu(contextMenu);
-
-  trayObj.main = tray;
+  trayObj.setToolTip('price');
+  trayObj.setContextMenu(contextMenu);
 
   readSettings();
   setMainTray();
-
-  for (const s of Object.keys(symbolFilter)) {
-    trayObj[s] = new Tray(defaultIcon());
-  }
 
   if (process.env.NODE_ENV) {
     imageWin = new BrowserWindow({ width: 800, height: 600, frame: true, webPreferences: { nodeIntegration: true } });
@@ -167,10 +161,8 @@ app.on('ready', () => {
   getPrice();
 });
 
-ipcMain.on('showImg', (event, img, data, width, height) => {
-  if (trayObj[data.symbol]) {
-    trayObj[data.symbol].setImage(nativeImage.createFromDataURL(img).resize({ width, height }));
-  }
+ipcMain.on('showImg', (event, img, width, height) => {
+  trayObj.setImage(nativeImage.createFromDataURL(img).resize({ width, height }));
 });
 
 ipcMain.on('getSettings', event => {
@@ -179,24 +171,11 @@ ipcMain.on('getSettings', event => {
 
 ipcMain.on('updateSettings', (event, _symbolFilter) => {
   symbolFilter = _symbolFilter;
-  let settingsString = JSON.stringify(symbolFilter);
+  const settingsString = JSON.stringify(symbolFilter);
   fs.writeFileSync(settingsFilePath, settingsString);
 
-  let symbolArr = Object.keys(symbolFilter);
-  symbolArr.push('main');
-  for (const s in trayObj) {
-    if (symbolArr.indexOf(s) == -1) {
-      if (trayObj[s]) {
-        trayObj[s].destroy();
-        trayObj[s] = null;
-      }
-    }
-  }
-
-  for (const s of symbolArr) {
-    if (!trayObj[s]) {
-      trayObj[s] = new Tray(defaultIcon());
-    }
+  if (!Object.keys(symbolFilter).length) {
+    trayObj.setImage(defaultIcon());
   }
 });
 
