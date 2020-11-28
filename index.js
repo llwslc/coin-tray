@@ -1,5 +1,6 @@
 const { app, Menu, ipcMain, BrowserWindow, nativeImage, nativeTheme, Tray } = require('electron');
 const http = require('http');
+const https = require('https');
 const path = require('path');
 const fs = require('fs');
 
@@ -19,6 +20,7 @@ const useProxy = true;
 const priceUrl = 'https://data.gateio.life/api2/1/marketlist';
 
 const getPrice = () => {
+  const mHttp = useProxy ? http : https;
   const url = useProxy
     ? {
         host: '127.0.0.1',
@@ -27,7 +29,7 @@ const getPrice = () => {
       }
     : priceUrl;
 
-  http
+  mHttp
     .get(url, res => {
       let rawData = '';
       res.on('data', chunk => {
@@ -190,4 +192,8 @@ ipcMain.on('searchSymbol', (event, symbol, opt) => {
   } else {
     event.sender.webContents.stopFindInPage('clearSelection');
   }
+});
+
+process.on('uncaughtException', function (error) {
+  console.log(error);
 });
