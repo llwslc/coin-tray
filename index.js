@@ -12,52 +12,57 @@ let baseUrl = 'http://localhost:8080/#';
 let symbolCache = [];
 let settingsFileName = 'settings';
 let settingsFilePath = '';
-let isDarkMode = nativeTheme.shouldUseDarkColors;
+
+const useDarkMode = true;
+let isDarkMode = useDarkMode ? nativeTheme.shouldUseDarkColors : false;
+const useProxy = true;
+const priceUrl = 'https://data.gateio.life/api2/1/marketlist';
 
 const getPrice = () => {
-  http
-    .get(
-      {
+  const url = useProxy
+    ? {
         host: '127.0.0.1',
         port: 7890,
-        path: 'https://data.gateio.life/api2/1/marketlist'
-      },
-      res => {
-        let rawData = '';
-        res.on('data', chunk => {
-          rawData += chunk;
-        });
-        res.on('end', () => {
-          try {
-            const d = JSON.parse(rawData);
-            const symbolArr = Object.keys(symbolFilter);
-            const imgData = [];
-            symbolCache = d.data;
-            for (const p of symbolCache) {
-              p.symbol = p.pair;
-              p.price = p.rate;
-              if (symbolArr.indexOf(p.symbol) > -1) {
-                p.price = parseFloat(p.price);
-                p.rename = symbolFilter[p.symbol].rename;
-                p.isDarkMode = isDarkMode;
-                if (p.price >= symbolFilter[p.symbol].high || p.price <= symbolFilter[p.symbol].low) {
-                  p.warning = true;
-                } else {
-                  p.warning = false;
-                }
-                imgData.push(p);
-              }
-            }
-            imageWin.webContents.send('genImg', imgData);
-          } catch (error) {
-            // error
-            console.log(`[${new Date().toLocaleTimeString('en-GB')}]api: ${error.message}`);
-          }
-
-          setTimeout(getPrice, refreshTime);
-        });
+        path: priceUrl
       }
-    )
+    : priceUrl;
+
+  http
+    .get(url, res => {
+      let rawData = '';
+      res.on('data', chunk => {
+        rawData += chunk;
+      });
+      res.on('end', () => {
+        try {
+          const d = JSON.parse(rawData);
+          const symbolArr = Object.keys(symbolFilter);
+          const imgData = [];
+          symbolCache = d.data;
+          for (const p of symbolCache) {
+            p.symbol = p.pair;
+            p.price = p.rate;
+            if (symbolArr.indexOf(p.symbol) > -1) {
+              p.price = parseFloat(p.price);
+              p.rename = symbolFilter[p.symbol].rename;
+              p.isDarkMode = isDarkMode;
+              if (p.price >= symbolFilter[p.symbol].high || p.price <= symbolFilter[p.symbol].low) {
+                p.warning = true;
+              } else {
+                p.warning = false;
+              }
+              imgData.push(p);
+            }
+          }
+          imageWin.webContents.send('genImg', imgData);
+        } catch (error) {
+          // error
+          console.log(`[${new Date().toLocaleTimeString('en-GB')}]api: ${error.message}`);
+        }
+
+        setTimeout(getPrice, refreshTime);
+      });
+    })
     .on('error', error => {
       console.error(`[${new Date().toLocaleTimeString('en-GB')}]http: ${error.message}`);
       setTimeout(getPrice, refreshTime);
@@ -134,7 +139,7 @@ app.on('ready', () => {
   trayObj.setContextMenu(contextMenu);
 
   readSettings();
-  setMainTray();
+  useDarkMode && setMainTray();
 
   if (process.env.NODE_ENV) {
     imageWin = new BrowserWindow({ width: 800, height: 600, frame: true, webPreferences: { nodeIntegration: true } });
