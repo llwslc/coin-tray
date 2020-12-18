@@ -12,7 +12,7 @@
       <span>High Alarm</span>
     </div>
     <div class="list">
-      <div v-for="item in symbols" :key="item.rename">
+      <div v-for="item in symbols" :key="item.symbol">
         <div class="col5">
           <VueSwitch class="extend-left" v-model="item.show">{{ item.symbol }}</VueSwitch>
           <VueInput v-model="item.rename" placeholder="rename" />
