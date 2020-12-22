@@ -83,10 +83,8 @@ const readSettings = () => {
 };
 
 const defaultIcon = () => {
-  let iconImg = nativeImage.createFromPath(`${__dirname}/icon/icon.png`);
+  const iconImg = nativeImage.createFromPath(`${__dirname}/icon/icon.png`).resize({ width: 22, height: 22 });
   iconImg.setTemplateImage(true);
-  iconImg = iconImg.resize({ width: 22, height: 22 });
-
   return iconImg;
 };
 
@@ -156,9 +154,8 @@ app.on('ready', () => {
 });
 
 ipcMain.on('showImg', (event, img, width, height) => {
-  let iconImg = nativeImage.createFromDataURL(img);
+  const iconImg = nativeImage.createFromDataURL(img).resize({ width, height });
   iconImg.setTemplateImage(true);
-  iconImg = iconImg.resize({ width, height });
   trayObj.setImage(iconImg);
 });
 
