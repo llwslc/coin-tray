@@ -45,9 +45,9 @@ export default {
 
       ctx.clearRect(0, 0, width, height);
       for (const p of prices) {
-        p.warning ? (ctx.fillStyle = '#2865C7') : (ctx.fillStyle = 'rgba(255, 255, 255, 0)');
+        p.warning ? (ctx.fillStyle = '#000') : (ctx.fillStyle = 'rgba(0, 0, 0, 0)');
         ctx.fillRect(p.offset, 0, p.width, height);
-        p.isDarkMode ? (ctx.fillStyle = '#FFF') : (ctx.fillStyle = '#000');
+        p.warning ? (ctx.fillStyle = '#FFF') : (ctx.fillStyle = 'rgba(0, 0, 0, 1)');
         ctx.font = '10px';
         ctx.fillText(p.rename, p.offset, height / 2 - 1);
         ctx.fillText(p.price, p.offset, height - 1);

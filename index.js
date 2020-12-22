@@ -14,9 +14,7 @@ let symbolCache = [];
 let settingsFileName = 'settings';
 let settingsFilePath = '';
 
-const useDarkMode = true;
-let isDarkMode = useDarkMode ? nativeTheme.shouldUseDarkColors : false;
-const useProxy = true;
+const useProxy = false;
 const priceUrl = 'https://data.gateio.life/api2/1/marketlist';
 
 const getPrice = () => {
@@ -47,7 +45,6 @@ const getPrice = () => {
             if (symbolArr.indexOf(p.symbol) > -1) {
               p.price = parseFloat(p.price);
               p.rename = symbolFilter[p.symbol].rename;
-              p.isDarkMode = isDarkMode;
               if (p.price >= symbolFilter[p.symbol].high || p.price <= symbolFilter[p.symbol].low) {
                 p.warning = true;
               } else {
@@ -86,20 +83,11 @@ const readSettings = () => {
 };
 
 const defaultIcon = () => {
-  return nativeImage
-    .createFromPath(`${__dirname}/icon/icon_${isDarkMode ? 'white' : 'black'}.png`)
-    .resize({ width: 22, height: 22 });
-};
+  let iconImg = nativeImage.createFromPath(`${__dirname}/icon/icon.png`);
+  iconImg.setTemplateImage(true);
+  iconImg = iconImg.resize({ width: 22, height: 22 });
 
-const setMainTray = () => {
-  if (isDarkMode != nativeTheme.shouldUseDarkColors) {
-    isDarkMode = nativeTheme.shouldUseDarkColors;
-    trayObj.setImage(defaultIcon());
-  }
-
-  setTimeout(() => {
-    setMainTray();
-  }, refreshTime);
+  return iconImg;
 };
 
 app.allowRendererProcessReuse = true;
@@ -141,7 +129,6 @@ app.on('ready', () => {
   trayObj.setContextMenu(contextMenu);
 
   readSettings();
-  useDarkMode && setMainTray();
 
   if (process.env.NODE_ENV) {
     imageWin = new BrowserWindow({ width: 800, height: 600, frame: true, webPreferences: { nodeIntegration: true } });
@@ -169,7 +156,10 @@ app.on('ready', () => {
 });
 
 ipcMain.on('showImg', (event, img, width, height) => {
-  trayObj.setImage(nativeImage.createFromDataURL(img).resize({ width, height }));
+  let iconImg = nativeImage.createFromDataURL(img);
+  iconImg.setTemplateImage(true);
+  iconImg = iconImg.resize({ width, height });
+  trayObj.setImage(iconImg);
 });
 
 ipcMain.on('getSettings', event => {
