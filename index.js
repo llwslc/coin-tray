@@ -56,7 +56,7 @@ const getPrice = () => {
           imageWin.webContents.send('genImg', imgData);
         } catch (error) {
           // error
-          console.log(`[${new Date().toLocaleTimeString('en-GB')}]api: ${error.message}`);
+          console.error(`[${new Date().toLocaleTimeString('en-GB')}]api: ${error.message}`);
         }
 
         setTimeout(getPrice, refreshTime);
