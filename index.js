@@ -84,7 +84,7 @@ const readSettings = () => {
 
 const defaultIcon = () => {
   const iconImg = nativeImage.createFromPath(`${__dirname}/icon/icon.png`).resize({ width: 22, height: 22 });
-  iconImg.setTemplateImage(true);
+  iconImg.isMacTemplateImage = true;
   return iconImg;
 };
 
@@ -155,7 +155,7 @@ app.on('ready', () => {
 
 ipcMain.on('showImg', (event, img, width, height) => {
   const iconImg = nativeImage.createFromDataURL(img).resize({ width, height });
-  iconImg.setTemplateImage(true);
+  iconImg.isMacTemplateImage = true;
   trayObj.setImage(iconImg);
 });
 
