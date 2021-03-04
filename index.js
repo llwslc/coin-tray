@@ -15,7 +15,7 @@ let settingsFileName = 'settings';
 let settingsFilePath = '';
 
 const useProxy = false;
-const priceUrl = 'https://data.gateio.life/api2/1/marketlist';
+const priceUrl = 'https://api.binance.com/api/v3/ticker/price';
 
 const getPrice = () => {
   const mHttp = useProxy ? http : https;
@@ -35,13 +35,10 @@ const getPrice = () => {
       });
       res.on('end', () => {
         try {
-          const d = JSON.parse(rawData);
+          symbolCache = JSON.parse(rawData);
           const symbolArr = Object.keys(symbolFilter);
           const imgData = [];
-          symbolCache = d.data;
           for (const p of symbolCache) {
-            p.symbol = p.pair;
-            p.price = p.rate;
             if (symbolArr.indexOf(p.symbol) > -1) {
               p.price = parseFloat(p.price);
               p.rename = symbolFilter[p.symbol].rename;

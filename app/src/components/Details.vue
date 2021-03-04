@@ -77,7 +77,7 @@ export default {
       const showSymbols = [];
       for (const s in this.symbolMap) {
         if (this.symbolName) {
-          if (s.indexOf(this.symbolName) > -1) {
+          if (s.toLowerCase().indexOf(this.symbolName.toLowerCase()) > -1) {
             showSymbols.push(this.symbolMap[s]);
           }
         } else {
