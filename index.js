@@ -36,6 +36,9 @@ const getPrice = () => {
       res.on('end', () => {
         try {
           symbolCache = JSON.parse(rawData);
+          if (symbolCache.code) {
+            throw new Error(symbolCache.msg);
+          }
           const symbolArr = Object.keys(symbolFilter);
           const imgData = [];
           for (const p of symbolCache) {
